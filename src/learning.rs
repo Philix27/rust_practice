@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 struct Book {
     pub id: String,
     pub name: String,
@@ -40,4 +41,11 @@ impl SchoolDef for LearningTips {
     fn return_self() -> Book {
         todo!()
     }
+}
+
+
+fn main() {
+    let v = LearningTips::AllocateBreak;
+
+    v.get_id();
 }
