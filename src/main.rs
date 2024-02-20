@@ -1,43 +1,47 @@
-#[allow(dead_code)]
-#[derive(Clone, Copy)]
-struct Book {
-    // `&'static str` is a reference to a string allocated in read only memo
-    author: &'static str,
-    title: &'static str,
-    year: u32,
+trait Greet {
+    fn greet(&self, name: &str) -> String;
+    fn greet_loudly(&self, name: &str) -> String {
+        self.greet(name) + "!"
+    }
 }
 
-// This function takes a reference to a book
-fn borrow_book(book: &Book) {
-    println!(
-        "I immutably borrowed {} - {} edition",
-        book.title, book.year
-    );
+struct Hello;
+struct Hola;
+
+// impl Clone for Hello {
+//     fn clone_from(&mut self, source: &Self) {
+//         *self = source.clone()
+//     }
+
+//     fn clone(&self) -> Self {
+//         Self {  }
+//     }
+// }
+
+// impl Copy for Hello {}
+
+impl Greet for Hello {
+    fn greet(&self, name: &str) -> String {
+        format!("Hello {}", name)
+    }
+    // use default impl for greet_loudly
 }
 
-// This function takes a reference to a mutable book and changes `year` to 2
-fn new_edition(book: &mut Book) {
-    book.year = 2014;
-    println!("I mutably borrowed {} - {} edition", book.title, book.year);
+impl Greet for Hola {
+    fn greet(&self, name: &str) -> String {
+        format!("Hola {}", name)
+    }
+    // override default impl
+    fn greet_loudly(&self, name: &str) -> String {
+        let mut greeting = self.greet(name);
+        greeting.insert_str(0, "¡");
+        greeting + "!"
+    }
 }
 
 fn main() {
-    // Create an immutable Book named `immutabook`
-    let immutabook = Book {
-        // string literals have type `&'static str`
-        author: "Douglas Hofstadter",
-        title: "Gödel, Escher, Bach",
-        year: 1979,
-    };
-    // Create a mutable copy of `immutabook` and call it `mutabook`
-    let mut mutabook = immutabook;
-    // Immutably borrow an immutable object
-    borrow_book(&immutabook);
-    // Immutably borrow a mutable object
-    borrow_book(&mutabook);
-    // Borrow a mutable object as mutable
-    new_edition(&mut mutabook);
-    // Error! Cannot borrow an immutable object as mutable
-    // new_edition(&mut immutabook);
-    // FIXME ^ Comment out this line
+    println!("{}", Hello.greet("John")); // prints "Hello John"
+    println!("{}", Hello.greet_loudly("John")); // prints "Hello John!"
+    println!("{}", Hola.greet("John")); // prints "Hola John"
+    println!("{}", Hola.greet_loudly("John")); // prints "¡Hola John!"
 }
